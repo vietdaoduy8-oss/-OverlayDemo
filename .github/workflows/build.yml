@@ -1,44 +1,21 @@
 name: Build Swift App to IPA
-on: [push, workflow_dispatch]
-
+on:
+  push:
+  workflow_dispatch:
 jobs:
   build:
     runs-on: macos-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v3
-
+        uses: actions/checkout@v4
       - name: Compile Swift App
         run: |
           mkdir -p Payload/OverlayApp.app
-          
-          xcrun -sdk iphoneos swiftc App.swift \
-            -target arm64-apple-ios14.0 \
-            -o Payload/OverlayApp.app/OverlayApp
-            
-          echo '<?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://apple.com">
-          <plist version="1.0">
-          <dict>
-              <key>CFBundleExecutable</key>
-              <string>OverlayApp</string>
-              <key>CFBundleIdentifier</key>
-              <string>com.lab.overlay.demo</string>
-              <key>CFBundleName</key>
-              <string>OverlayDemo</string>
-              <key>CFBundleShortVersionString</key>
-              <string>1.0</string>
-              <key>CFBundleVersion</key>
-              <string>1</string>
-              <key>MinimumOSVersion</key>
-              <string>14.0</string>
-          </dict>
-          </plist>' > Payload/OverlayApp.app/Info.plist
-
+          xcrun -sdk iphoneos swiftc App.swift -target arm64-apple-ios14.0 -o Payload/OverlayApp.app/OverlayApp
+          echo '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://apple.com"><plist version="1.0"><dict><key>CFBundleExecutable</key><string>OverlayApp</string><key>CFBundleIdentifier</key><string>com.lab.overlay.demo</string><key>CFBundleName</key><string>OverlayDemo</string><key>CFBundleShortVersionString</key><string>1.0</string><key>CFBundleVersion</key><string>1</string><key>MinimumOSVersion</key><string>14.0</string></dict></plist>' > Payload/OverlayApp.app/Info.plist
           zip -r OverlayApp.ipa Payload
-          
       - name: Upload Finished IPA
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: iOS-App-Package
           path: OverlayApp.ipa

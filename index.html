@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MÔ PHỎNG ĐỊNH VỊ ESP</title>
+    <style>
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background-color: #000; font-family: sans-serif; }
+        canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+        #menu { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10; width: 80%; text-align: center; }
+        button { background-color: #007bff; color: white; border: none; padding: 15px 30px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; width: 100%; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        button.active { background-color: #dc3545; }
+        #title { position: absolute; top: 40px; width: 100%; text-align: center; color: white; font-size: 16px; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+    </style>
+</head>
+<body>
+    <div id="title">MÔ PHỎNG ĐỒ HỌA ĐỊNH VỊ (ESP DEMO)</div>
+    <canvas id="espCanvas"></canvas>
+    <div id="menu">
+        <button id="trackBtn" onclick="toggleTracking()">BẮT ĐẦU BÁM ĐUỔI TỰ ĐỘNG</button>
+    </div>
+    <script>
+        const canvas = document.getElementById('espCanvas');
+        const ctx = canvas.getContext('2d');
+        const trackBtn = document.getElementById('trackBtn');
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        let isTracking = false;
+        let targetX = canvas.width / 2;
+        let targetY = canvas.height / 2;
+        let currentX = targetX;
+        let currentY = targetY;
+        function toggleTracking() {
+            isTracking = !isTracking;
+            if (isTracking) {
+                trackBtn.innerText = "DỪNG BÁM ĐUỔI";
+                trackBtn.classList.add('active');
+            } else {
+                trackBtn.innerText = "BẮT ĐẦU BÁM ĐUỔI TỰ ĐỘNG";
+                trackBtn.classList.remove('active');
+                targetX = canvas.width / 2;
+                targetY = canvas.height / 2;
+            }
+        }
+        function updatePosition() {
+            if (isTracking) {
+                if (Math.abs(currentX - targetX) < 5 && Math.abs(currentY - targetY) < 5) {
+                    targetX = Math.random() * (canvas.width - 100) + 50;
+                    targetY = Math.random() * (canvas.height - 200) + 100;
+                }
+            }
+            currentX += (targetX - currentX) * 0.1;
+            currentY += (targetY - currentY) * 0.1;
+        }
+        function drawESP() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.arc(canvas.width / 2, canvas.height / 2, 20, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(currentX, currentY - 40, 10, 0, Math.PI * 2);
+            ctx.fillStyle = '#dc3545';
+            ctx.fill();
+            ctx.beginPath();
+            ctx.strokeStyle = '#28a745';
+            ctx.lineWidth = 4;
+            ctx.moveTo(currentX - 25, currentY);
+            ctx.lineTo(currentX + 25, currentY);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(currentX, currentY + 40, 10, 0, Math.PI * 2);
+            ctx.fillStyle = '#007bff';
+            ctx.fill();
+            ctx.fillStyle = '#dc3545';
+            ctx.font = 'bold 11px sans-serif';
+            const text = "TARGET [15m]";
+            const textWidth = ctx.measureText(text).width;
+            ctx.fillRect(currentX - (textWidth/2) - 4, currentY + 60, textWidth + 8, 18);
+            ctx.fillStyle = 'white';
+            ctx.fillText(text, currentX - (textWidth/2), currentY + 73);
+        }
+        function loop() {
+            updatePosition();
+            drawESP();
+            requestAnimationFrame(loop);
+        }
+        loop();
+    </script>
+</body>
+</html>

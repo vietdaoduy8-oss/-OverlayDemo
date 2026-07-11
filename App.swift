@@ -1,13 +1,5 @@
 import SwiftUI
-
-@main
-struct OverlaySimulationApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
-    }
-}
+import UIKit
 
 struct ContentView: View {
     @State private var targetOffset = CGSize(width: 0, height: 0)
@@ -79,3 +71,20 @@ struct ContentView: View {
         }
     }
 }
+
+class AppDelegate: NSObject, UIApplicationDelegate {
+    var window: UIWindow?
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = UIHostingController(rootView: ContentView())
+        self.window = window
+        window.makeKeyAndVisible()
+        return true
+    }
+}
+
+UIApplicationMain(
+    CommandLine.argc,
+    CommandLine.unsafeArgv,
+    nil,
+    NSStringFromClass(AppDelegate.self)
